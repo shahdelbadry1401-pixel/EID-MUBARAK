@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>Festival Effect</title>
+
+<style>
+body{
+    margin:0;
+    background:black;
+    overflow:hidden;
+}
+
+/* canvas */
+canvas{
+    position:absolute;
+    top:0;
+    left:0;
+}
+
+/* image */
+.fadeImage{
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%,-50%) scale(0.8);
+
+    max-width:70vw;
+    max-height:70vh;
+    width:auto;
+    height:auto;
+
+    opacity:0;
+    filter:blur(20px);
+    animation:fadeImage 3s ease forwards;
+    animation-delay:3s;
+}
+
+@keyframes fadeImage{
+    to{
+        opacity:1;
+        filter:blur(0);
+        transform:translate(-50%,-50%) scale(1);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas"></canvas>
+
+<img src="image.PNG" class="fadeImage">
+
+<script>
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+/* ⭐ STARS (الخلفية) */
+let stars=[];
+for(let i=0;i<250;i++){
+    stars.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        size:Math.random()*1.5,
+        alpha:Math.random(),
+        speed:Math.random()*0.02,
+        hue:Math.random()*360
+    });
+}
+
+/* 🎉 CONFETTI */
+let particles=[];
+
+function createExplosion(x,y){
+    for(let i=0;i<80;i++){
+        particles.push({
+            x:x,
+            y:y,
+            size:Math.random()*6+2,
+            speedX:(Math.random()-0.5)*6,
+            speedY:(Math.random()-0.5)*6,
+            color:`hsl(${Math.random()*360},100%,50%)`,
+            life:100
+        });
+    }
+}
+
+/* انفجارات */
+setInterval(()=>{
+    createExplosion(
+        Math.random()*canvas.width,
+        Math.random()*canvas.height/2
+    );
+},500);
+
+function animate(){
+    ctx.fillStyle="rgba(0,0,0,0.2)";
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    /* ⭐ رسم النجوم */
+    stars.forEach(star=>{
+        star.alpha += star.speed;
+        if(star.alpha <= 0 || star.alpha >= 1){
+            star.speed *= -1;
+        }
+
+        star.hue += 0.2;
+
+        ctx.beginPath();
+        ctx.arc(star.x,star.y,star.size,0,Math.PI*2);
+        ctx.fillStyle=`hsla(${star.hue},100%,70%,${star.alpha})`;
+        ctx.fill();
+    });
+
+    /* 🎉 الكونفيتي */
+    particles.forEach((p,index)=>{
+        p.x+=p.speedX;
+        p.y+=p.speedY;
+        p.life--;
+
+        ctx.beginPath();
+        ctx.fillStyle=p.color;
+        ctx.fillRect(p.x,p.y,p.size,p.size);
+
+        if(p.life<=0){
+            particles.splice(index,1);
+        }
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
