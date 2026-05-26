@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const currentPage = window.location.pathname.split('/').pop();
+const rawPage = window.location.pathname.split('/').pop();
+const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
   document.querySelectorAll('.icon-slot').forEach(slot => {
     if (slot.getAttribute('href') === currentPage) {
       slot.classList.add('active');
@@ -22,21 +23,21 @@ document.addEventListener('DOMContentLoaded', () => {
     im.src = src;
     imageCache.set(src, im);
   }
-  ['baby blue.webp','baby pink.webp','baby purple.webp','blue.webp','burgandy.webp','mint green.webp','purple.webp','red.webp','yellow.webp','baby blue1.webp','baby pink1.webp','baby purple1.webp','blue1.webp','burgandy1.webp','mint green1.webp','purple1.webp','red1.webp','yellow1.webp','eid-mubarak.webp'].forEach(preload);
+  ['baby_blue.webp','baby_pink.webp','baby_purple.webp','blue.webp','burgandy.webp','mint_green.webp','purple.webp','red.webp','yellow.webp','baby_blue1.webp','baby_pink1.webp','baby_purple1.webp','blue1.webp','burgandy1.webp','mint_green1.webp','purple1.webp','red1.webp','yellow1.webp','eid_mubarak.webp', 'eid-color.webp'].forEach(preload);
   // cap active balloons to reduce lag
   let activeBalloons = 0;
-  const MAX_ACTIVE_BALLOONS = 12;
+  const MAX_ACTIVE_BALLOONS = 1000;
 
   function spawnBalloon() {
     if (!balloonStage) return;
     if (activeBalloons >= MAX_ACTIVE_BALLOONS) return;
     const balloonImages = [
-      { src: 'baby blue.webp', color: '#a2dff7' },
-      { src: 'baby pink.webp', color: '#ffb6c1' },
-      { src: 'baby purple.webp', color: '#d6b3ff' },
+      { src: 'baby_blue.webp', color: '#a2dff7' },
+      { src: 'baby_pink.webp', color: '#ffb6c1' },
+      { src: 'baby_purple.webp', color: '#d6b3ff' },
       { src: 'blue.webp', color: '#2b6cf8' },
       { src: 'burgandy.webp', color: '#7b113a' },
-      { src: 'mint green.webp', color: '#99e2b4' },
+      { src: 'mint_green.webp', color: '#99e2b4' },
       { src: 'purple.webp', color: '#9b5fc0' },
       { src: 'red.webp', color: '#d7383f' },
       { src: 'yellow.webp', color: '#f7d153' }
@@ -69,7 +70,7 @@ document.addEventListener('DOMContentLoaded', () => {
         spotImg.className = 'color-spot-img';
         spotImg.src = spotSrc;
         spotImg.alt = 'spot';
-        const spotSize = Math.max(parseFloat(balloon.style.width) || 70, 70) * 0.9;
+        const spotSize = Math.max(parseFloat(balloon.style.width) || 70, 70) * 1.5;
         spotImg.style.width = `${spotSize}px`;
         spotImg.style.height = 'auto';
         spotImg.style.left = `${x}px`;
@@ -277,18 +278,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Play Eid image animation on load: full on Mosque, simple on Balloons
-  if (currentPage === 'Mosque.html') {
+  if (currentPage === 'mosque.html') {
     // small delay so transition is visible after load
     setTimeout(animateEid, 80);
   }
-  if (currentPage === 'Balloons.html') {
+  if (currentPage === 'balloons.html') {
     // hide the caption text on Balloons page
     if (eidCaption) eidCaption.style.display = 'none';
     setTimeout(animateEidSimple, 80);
   }
 
   // Play balloon entry on load if on Balloons page
-  if (currentPage === 'Balloons.html') {
+  if (currentPage === 'balloons.html') {
     setTimeout(animateBalloons, 120);
   }
 
@@ -296,10 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.icon-slot').forEach(slot => {
     const href = slot.getAttribute('href');
     if (!href) return;
-    if (href.endsWith('Mosque.html')) {
+    if (href.endsWith('mosque.html')) {
       slot.addEventListener('click', (e) => {
-        const nowPage = window.location.pathname.split('/').pop();
-        if (nowPage === 'Mosque.html') {
+        const rawNow = window.location.pathname.split('/').pop();
+        const nowPage = rawNow.endsWith('.html') ? rawNow : rawNow + '.html';
+        if (nowPage === 'mosque.html') {
           e.preventDefault();
           // reload the page to restart animations (fireworks + typing)
           window.location.reload();
@@ -307,10 +309,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // otherwise allow normal navigation (animation will play on load)
       });
     }
-    if (href.endsWith('Balloons.html')) {
+    if (href.endsWith('balloons.html')) {
       slot.addEventListener('click', (e) => {
-        const nowPage = window.location.pathname.split('/').pop();
-        if (nowPage === 'Balloons.html') {
+       const rawNow = window.location.pathname.split('/').pop();
+       const nowPage = rawNow.endsWith('.html') ? rawNow : rawNow + '.html';
+       if (nowPage === 'balloons.html') {
           e.preventDefault();
           // reload to restart balloons and clear any spots
           window.location.reload();
