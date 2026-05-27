@@ -11,10 +11,12 @@ const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
   const eidCaption = document.getElementById('eid-caption');
   const balloonStage = document.getElementById('balloon-stage');
   const spotLayer = document.getElementById('spot-layer');
+  const balloonScoreBox = document.getElementById('balloon-score');
   let fireworksTimeout = null;
   let fireworksRaf = null;
   let typingTimer = null;
   let balloonTimers = [];
+  let balloonScore = 0;  // track balloon clicks
   // preload images to avoid rendering jank
   const imageCache = new Map();
   function preload(src) {
@@ -23,7 +25,7 @@ const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
     im.src = src;
     imageCache.set(src, im);
   }
-  ['baby_blue.webp','baby_pink.webp','baby_purple.webp','blue.webp','burgandy.webp','mint_green.webp','purple.webp','red.webp','yellow.webp','baby_blue1.webp','baby_pink1.webp','baby_purple1.webp','blue1.webp','burgandy1.webp','mint_green1.webp','purple1.webp','red1.webp','yellow1.webp','eid_mubarak.webp', 'eid-color.webp'].forEach(preload);
+  ['baby_blue.webp','baby_pink.webp','baby_purple.webp','blue.webp','burgandy.webp','mint_green.webp','purple.webp','red.webp','yellow.webp','baby_blue1.webp','baby_pink1.webp','baby_purple1.webp','blue1.webp','burgandy1.webp','mint_green1.webp','purple1.webp','red1.webp','yellow1.webp','eid_mubarak.webp', 'eid-color.webp','sheep-3dya.webp','dollars.webp'].forEach(preload);
   // cap active balloons to reduce lag
   let activeBalloons = 0;
   const MAX_ACTIVE_BALLOONS = 1000;
@@ -82,6 +84,14 @@ const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
         }
         // reveal smoothly
         requestAnimationFrame(() => spotImg.classList.add('visible'));
+
+        // increment balloon score
+        balloonScore++;
+        if (balloonScoreBox) {
+          balloonScoreBox.textContent = `Score:${balloonScore}`;
+          // show score box on first balloon click
+          if (balloonScore === 1) balloonScoreBox.style.display = 'block';
+        }
 
         balloon.classList.add('selected');
         balloon.classList.add('splat');
@@ -154,7 +164,7 @@ const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
   }
 
   // Simple fireworks particle system for a short duration (ms)
-  function startFireworks(duration = 2000) {
+  function startFireworks(duration = 2000, onComplete) {
     // clear any existing
     if (fireworksRaf) {
       cancelAnimationFrame(fireworksRaf);
@@ -254,9 +264,49 @@ const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
         window.removeEventListener('resize', resize);
         if (canvas && canvas.parentNode) canvas.parentNode.removeChild(canvas);
       }, 800);
-      // start typing once fireworks finished
-      startTyping();
+      // call onComplete or start typing once fireworks finished
+      if (typeof onComplete === 'function') {
+        try { onComplete(); } catch (e) { console.error(e); }
+      } else {
+        startTyping();
+      }
     }, duration);
+  }
+
+  // show dollars image with caption in a centered overlay
+  function showDollars() {
+    // remove existing overlay if present
+    const existing = document.getElementById('dollars-overlay');
+    if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
+    const overlay = document.createElement('div');
+    overlay.id = 'dollars-overlay';
+    overlay.className = 'dollars-overlay';
+    const img = document.createElement('img');
+    img.src = 'dollars.webp';
+    img.alt = 'dollars';
+    img.className = 'dollars-image';
+    overlay.appendChild(img);
+    const cap = document.createElement('div');
+      cap.className = 'dollars-caption';
+      cap.innerHTML = '<span class="dollars-main">Enjoy your 3dya❤️</span><br><span class="dollars-sub">From Shahd!</span>';
+    overlay.appendChild(cap);
+    // add a close button so user can dismiss without reloading
+    const close = document.createElement('button');
+    close.className = 'dollars-close';
+    close.setAttribute('aria-label', 'Close');
+    close.textContent = '✕';
+    overlay.appendChild(close);
+    close.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    });
+    document.body.appendChild(overlay);
+    // force reflow then pop
+    // eslint-disable-next-line no-unused-expressions
+    img.offsetWidth;
+    img.classList.add('pop');
+    requestAnimationFrame(() => cap.classList.add('visible'));
+    // keep overlay persistent until page reload (will be cleared on navigation/reload)
   }
 
   function startTyping() {
@@ -321,4 +371,24 @@ const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
       });
     }
   });
+
+  // reveal button on Sheep page: fireworks then show dollars image
+  const revealBtn = document.getElementById('reveal-button');
+  const balanceEl = document.getElementById('balance');
+  const eidSaeedText = document.getElementById('eid-saeed-text');
+  if (revealBtn) {
+    revealBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      // hide the Eid saeed greeting text instantly
+      if (eidSaeedText) eidSaeedText.classList.add('hidden');
+      // update balance display immediately with animation
+      if (balanceEl) {
+        balanceEl.textContent = '3dya:1000$';
+        balanceEl.classList.add('updated');
+        setTimeout(() => balanceEl.classList.remove('updated'), 900);
+      }
+      // start fireworks for 2000ms then show dollars overlay
+      startFireworks(2000, showDollars);
+    });
+  }
 });

@@ -1,4 +1,8 @@
 :root {
+  /* change this single value to move the reveal button (and sheep footer) vertically */
+  --sheep-footer-bottom: 24px; /* e.g. 24px (near bottom) or 120px (higher) */
+  /* change this single value to raise/lower only the reveal button (negative to raise) */
+  --reveal-button-raise: -20px; /* e.g. -40px */
   color-scheme: light;
   font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background-color: #ffffff;
@@ -261,4 +265,186 @@ body {
   .icon-slot {
     flex: 1;
   }
+}
+
+/* Sheep footer + reveal button */
+.sheep-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: var(--sheep-footer-bottom);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+/* allow moving only the reveal button without shifting the sheep images */
+.sheep-footer .reveal-button {
+  transform: translateY(var(--reveal-button-raise));
+  transition: transform 200ms ease;
+  z-index: 55;
+}
+.sheep-row {
+  display: flex;
+  gap: 28px;
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheep-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.sheep-img {
+  width: 110px;
+  height: auto;
+  transform-origin: center bottom;
+  animation: sheep-pop 1200ms ease-in-out infinite alternate;
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.12));
+}
+@keyframes sheep-pop {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-12px) scale(1.06); }
+}
+.reveal-button {
+  pointer-events: auto;
+  background: linear-gradient(90deg,#ffb6c1,#ffd166);
+  border: none;
+  padding: 10px 18px;
+  border-radius: 999px;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+  cursor: pointer;
+}
+
+/* top-right balance framed like the button */
+.balance {
+  position: fixed;
+  top: 135px;
+  right: 12px;
+  z-index: 60;
+  pointer-events: auto;
+}
+
+/* score box for Balloons page (top-right like balance) */
+.score-box {
+  position: fixed;
+  top: 135px;
+  right: 12px;
+  z-index: 60;
+  pointer-events: auto;
+}
+
+/* click on ballons instruction text (lower part of page) */
+.balloons-instruction {
+  position: fixed;
+  left: 50%;
+  bottom: 28px;
+  transform: translateX(-50%);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 600;
+  color: #111;
+  text-align: center;
+  z-index: 45;
+  pointer-events: none;
+  opacity: 0.9;
+  white-space: nowrap;
+}
+/* Eid saeed greeting text (center of page) */
+.eid-saeed-text {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+  font-weight: 700;
+  color: #111;
+  text-align: center;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 1;
+  transition: opacity 360ms ease, transform 360ms ease;
+  white-space: nowrap;
+}
+.eid-saeed-text.hidden {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.94);
+  pointer-events: none;
+}
+/* Dollars overlay (pop-in like eid) */
+.dollars-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 1005;
+  pointer-events: none;
+}
+.dollars-image {
+  width: min(100vw, 700px);
+  max-height: 60vh;
+  object-fit: contain;
+  border-radius: 8px;
+  transform: scale(0.88);
+  opacity: 0;
+  transition: transform 800ms cubic-bezier(.2,.9,.25,1), opacity 560ms ease;
+}
+.dollars-image.pop { transform: scale(1); opacity: 1; }
+.dollars-caption {
+  color: #000;
+  font-weight: 500;
+  font-size: clamp(0.8rem, 1.2vw, 1.05rem);
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 260ms ease, transform 360ms ease;
+}
+.dollars-caption.visible { opacity: 1; transform: translateY(0); }
+
+/* caption lines styling */
+.dollars-main {
+  display: block;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  font-weight: 800;
+  line-height: 1.05;
+}
+.dollars-sub {
+  display: block;
+  font-size: clamp(0.9rem, 1.2vw, 1.05rem);
+  font-weight: 600;
+  margin-top: 6px;
+  color: #333;
+}
+
+/* dollars overlay close button */
+.dollars-close {
+  position: absolute;
+  top: 200px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.6);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+/* animate balance change */
+.balance {
+  transition: transform 260ms cubic-bezier(.2,.9,.25,1), background 240ms ease;
+}
+.balance.updated {
+  transform: translateY(-6px) scale(1.04);
+  background: linear-gradient(90deg,#ffd166,#ffb6c1);
 }
