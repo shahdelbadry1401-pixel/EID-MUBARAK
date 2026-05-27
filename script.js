@@ -370,7 +370,18 @@ const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
         }
       });
     }
+      if (href.endsWith('sheep.html')) {
+  slot.addEventListener('click', (e) => {
+    const rawNow = window.location.pathname.split('/').pop();
+    const nowPage = rawNow.endsWith('.html') ? rawNow : rawNow + '.html';
+    if (nowPage === 'sheep.html') {
+      e.preventDefault();
+      window.location.reload();
+    }
   });
+}
+  });
+  
 
   // reveal button on Sheep page: fireworks then show dollars image
   const revealBtn = document.getElementById('reveal-button');
