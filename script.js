@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 const rawPage = window.location.pathname.split('/').pop();
-const currentPage = rawPage.endsWith('.html') ? rawPage : rawPage + '.html';
+let currentPage = rawPage || 'index';
+if (!currentPage.endsWith('.html')) currentPage = currentPage + '.html';
   document.querySelectorAll('.icon-slot').forEach(slot => {
     if (slot.getAttribute('href') === currentPage) {
       slot.classList.add('active');
